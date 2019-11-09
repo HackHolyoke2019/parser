@@ -3,9 +3,9 @@ from pymongo import MongoClient
 from twilio.rest import Client
 
 # Your Account SID from twilio.com/console
-account_sid = "***************************"
+account_sid = "AC1f54a75f31cadcde0916ece0c91b004c"
 # Your Auth Token from twilio.com/console
-auth_token  = "**************************"
+auth_token  = "69d01365cc53f0bc5012a777272529cd"
 client = Client(account_sid, auth_token)
 
 #this just connects to local host (27017) by default.
@@ -17,7 +17,7 @@ db = dbclient.db
 #get the collection from the db (users)
 collection = db.users
 
-def dictBuidler():
+def parse(transcript): #transcript is a string
 	bigDict = {}
 	for json in collection.find():  #go through all jsons in collection
 		for key in json["keywords"]: #iterate through array of keywords (key is a keyword)
@@ -26,12 +26,8 @@ def dictBuidler():
 			else:
 				phoneList = [json["phone"]]
 				bigDict.update({key: phoneList}) #add a new keyword:phone number array pair
-	return bigDict
 
-def main():
-	bigDict = dictBuidler()
-	transcript = ["Dylan"] #example transcript for testing
-
+	transcript = set(transcript.rsplit()) #break up transcript into set of strings
 	for v in transcript: #iterate through strings in transcript
 		if v in bigDict: #if a string is one of the keywords
   			for pn in bigDict[v]: #interate through list of phone numbers
@@ -39,10 +35,3 @@ def main():
     				to="+" + pn, 
     				from_="+12562697171",
    					body="Your keyword " + v + " was mentioned")
-
-
-
-
-
-if __name__ == '__main__':
-	main()
